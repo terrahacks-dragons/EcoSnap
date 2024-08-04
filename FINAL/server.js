@@ -1,4 +1,3 @@
-// server.js
 import express from 'express';
 import fetch from 'node-fetch';
 import multer from 'multer';
@@ -20,6 +19,7 @@ const port = 3000;
 // Ensure the uploads and processed directories exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const processedDir = path.join(__dirname, 'processed');
+const publicDir = path.join(__dirname, 'public');
 
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
@@ -29,13 +29,16 @@ if (!fs.existsSync(processedDir)) {
     fs.mkdirSync(processedDir);
 }
 
+if (!fs.existsSync(publicDir)) {
+    fs.mkdirSync(publicDir);
+}
+
 // Configure Multer for file uploads
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         cb(null, uploadsDir);
     },
     filename: (req, file, cb) => {
-        // Preserve original filename with extension
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         const extension = path.extname(file.originalname);
         cb(null, uniqueSuffix + extension);
@@ -44,24 +47,25 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-// Serve static files from the root directory
-app.use(express.static('.'));
+// Serve static files from the "public" directory
+app.use(express.static(publicDir));
 
 // Parse JSON bodies
-app.use(express.json());
+app.use(express.json({ limit: '50mb' }));
+
+// Serve the Menu-Companion.html at the root URL
+app.get('/menu-companion', (req, res) => {
+    res.sendFile(path.join(publicDir, 'Menu-Companion.html'));
+});
 
 // API endpoint for analyzing images
 app.post('/analyze', upload.single('image'), async (req, res) => {
     try {
-        // Check if file was uploaded
         if (!req.file) {
             return res.status(400).json({ error: 'No image provided' });
         }
 
-        // Get the file path directly from multer
         const imagePath = req.file.path;
-
-        // Read and encode the image to base64
         const imageBuffer = fs.readFileSync(imagePath);
         const base64Image = imageBuffer.toString('base64');
 
@@ -70,7 +74,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`
         };
 
-        const payload = ({
+        const payload = {
             model: 'gpt-4o-mini',
             messages: [
                 {
@@ -78,7 +82,11 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                     content: [
                         {
                             type: 'text',
-                            text: 'Analyze the following image and provide the environmental sustainability score out of 5, sustainable alternatives, and the name of the food item in the following format: {"name": "food item", "sustainability_score": score, "sustainable_alternatives": ["alternative1", "alternative2"]}. If the item is not food, return {"error": "not food"}.'
+                            text: 'Please analyze the following image and provide the information in a structured, human-readable format. ' +
+                                'For each identified food item, provide the following on a single line: item name, estimated calories, and sustainability score. ' +
+                                'Include a description of the food item in two sentences. ' +
+                                'If the item is not food, state that it is not food and omit calorie and other food information. ' +
+                                'Ensure clarity and readability, using complete sentences.'
                         },
                         {
                             type: 'image_url',
@@ -89,8 +97,8 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                     ]
                 }
             ],
-            max_tokens: 150
-        });
+            max_tokens: 300
+        };
 
         const response = await fetch('https://api.openai.com/v1/chat/completions', {
             method: 'POST',
@@ -99,22 +107,29 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
         });
 
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorText = await response.text();
+            throw new Error(`HTTP error! Status: ${response.status} - ${errorText}`);
         }
 
         const data = await response.json();
+        console.log('Full API Response:', JSON.stringify(data, null, 2)); // Log full response for debugging
+
+        const messageContent = data.choices[0].message.content;
+
+        if (messageContent.includes('not food')) {
+            return res.json({ error: 'Not recognized as food' });
+        }
+
+        // Send the entire message content to the client for parsing
+        res.json({ content: messageContent });
 
         // Define the new path in the processed directory with the correct extension
         const newImagePath = path.join(processedDir, req.file.filename);
-
-        // Move the file to the processed directory
         fs.rename(imagePath, newImagePath, (err) => {
             if (err) {
                 console.error('Error moving file:', err);
                 return res.status(500).json({ error: 'Failed to move processed image' });
             }
-
-            res.json(data);
         });
     } catch (error) {
         console.error('Error:', error);
@@ -122,15 +137,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
     }
 });
 
-// Serve index.html at the root URL
-app.get('/', (req, res) => {
-    res.sendFile('index.html', { root: '.' }, (err) => {
-        if (err) {
-            res.status(500).send('Error loading the index.html file');
-        }
-    });
-});
-
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+    console.log(`Server running at http://localhost:${port}/menu-companion`);
 });

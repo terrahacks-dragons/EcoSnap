@@ -54,7 +54,7 @@ function displayDescription(data) {
     if (data.choices && data.choices.length > 0) {
         const choice = data.choices[0];
         const messageContent = choice.message.content;
-        descriptionText.innerHTML = `Description: ${messageContent}`;
+        descriptionText.innerHTML = ` ${messageContent}`;
     } else {
         descriptionText.textContent = 'No description available.';
     }
