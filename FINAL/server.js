@@ -98,7 +98,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                                 '    "description": ""\n' +
                                 '  }\n' +
                                 '}\n\n' +
-                                'Please include the item name, estimated calories, sustainability score out of 5, and a brief description of the food item. ' +
+                                'Please include the item name, estimated calories (never leave calories blank always give a number), sustainability score out of 5, and a brief description of the food item. ' +
                                 'If the item is not food, you can leave all fields as empty strings.'
                         },
                         {
