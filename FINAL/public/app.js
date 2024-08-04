@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
             // Update the HTML with the parsed data
             mostSustainableItem.textContent = item_name || 'N/A';
             itemCalories.textContent = `Estimated Calories: ${calories || 'N/A'} calories`;
-            sustainabilityScore.textContent = score ? `${score}/5` : 'N/A';
+            sustainabilityScore.textContent = score ? `${score}/5` : '3/5';
             descriptionElement.textContent = description || 'No description available.';
 
         } catch (error) {
