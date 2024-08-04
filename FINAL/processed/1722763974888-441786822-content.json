@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "Corn is a popular cereal grain that is often consumed as a vegetable. It can be eaten on the cob, as cornmeal, or in various dishes.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Farro",
+      "Millet",
+      "Sorghum",
+      "Barley"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A cob of sweet corn, known for its bright yellow kernels and mild flavor.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Millet",
+      "Barley",
+      "Brown Rice",
+      "Oats"
+    ]
+  }
+}

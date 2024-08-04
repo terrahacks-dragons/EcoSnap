@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "Corn is a cereal grain that is a key ingredient in many dishes and snacks, known for its sweet flavor and versatility in cooking.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Millet",
+      "Sorghum",
+      "Brown Rice",
+      "Oats"
+    ]
+  }
+}

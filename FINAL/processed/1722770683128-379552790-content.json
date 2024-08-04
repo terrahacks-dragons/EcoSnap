@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A nutritious vegetable known for its sweet flavor and yellow kernels, commonly eaten on the cob or used in various dishes.",
+    "sugar": "6",
+    "protein": "3.4",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Barley",
+      "Millet",
+      "Faro",
+      "Brown Rice"
+    ]
+  }
+}

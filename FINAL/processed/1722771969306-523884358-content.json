@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A sweet, yellow vegetable that is often used in cooking, grilling, or as a sweet snack.",
+    "sugar": "6.3",
+    "protein": "3.2",
+    "fat": "1.2",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown rice",
+      "Millet",
+      "Barley",
+      "Sweet potatoes"
+    ]
+  }
+}

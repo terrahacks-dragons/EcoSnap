@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A nutritious vegetable often enjoyed in various dishes or as a snack.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Barley",
+      "Oats",
+      "Amaranth",
+      "Millet"
+    ]
+  }
+}

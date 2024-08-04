@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A popular vegetable known for its sweet flavor and versatile use in various dishes.",
+    "sugar": "6",
+    "protein": "3.4",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Millet",
+      "Brown rice",
+      "Barley",
+      "Oats"
+    ]
+  }
+}

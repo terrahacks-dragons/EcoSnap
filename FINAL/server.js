@@ -72,6 +72,14 @@ app.get('/menu-companion', (req, res) => {
     res.sendFile(path.join(publicDir, 'Menu-Companion.html'));
 });
 
+app.get('/food-companion', (req, res) => {
+    res.sendFile(path.join(publicDir, 'Food-Companion.html'));
+});
+
+app.get('/shopping-companion', (req, res) => {
+    res.sendFile(path.join(publicDir, 'Shopping-Companion.html'));
+});
+
 // Serve the index.css file
 app.use('/index.css', express.static(path.join(publicDir, 'index.css')));
 
@@ -81,6 +89,8 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
         if (!req.file) {
             return res.status(400).json({ error: 'No image provided' });
         }
+
+        console.log('File uploaded:', req.file);
 
         const imagePath = req.file.path;
         const imageBuffer = fs.readFileSync(imagePath);
@@ -143,7 +153,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
         }
 
         const data = await response.json();
-        console.log('Full API Response:', JSON.stringify(data, null, 2)); // Log full response for debugging
+        console.log('Full API Response:', JSON.stringify(data, null, 2));
 
         const messageContent = data.choices[0].message.content;
 
@@ -151,7 +161,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             return res.json({ error: 'Not recognized as food' });
         }
 
-        // Extract and clean up JSON string from the description field
         const cleanedContent = messageContent.replace(/```json\n|\n```/g, '');
         let parsedContent;
 
@@ -162,10 +171,8 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             return res.status(500).json({ error: 'Failed to parse JSON content' });
         }
 
-        // Extract content
         const { content } = parsedContent;
 
-        // Create the finalContent object with new fields
         const finalContent = {
             item_name: content.item_name || 'Unknown',
             calories: content.calories || 'N/A',
@@ -177,7 +184,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             sustainable_alternatives: content.sustainable_alternatives || []
         };
 
-        // Define the new path in the processed directory with the correct extension
         const newImagePath = path.join(processedDir, req.file.filename);
         fs.rename(imagePath, newImagePath, (err) => {
             if (err) {
@@ -186,7 +192,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             }
         });
 
-        // Save the parsed content as a .json file in the specified format
         const jsonFilename = `${path.basename(newImagePath, path.extname(newImagePath))}-content.json`;
         const jsonFilePath = path.join(processedDir, jsonFilename);
 
@@ -196,7 +201,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                 return res.status(500).json({ error: 'Failed to save JSON response' });
             }
 
-            // Update the global entries.json file
             fs.readFile(entriesFilePath, (err, data) => {
                 if (err) {
                     console.error('Error reading entries file:', err);
@@ -204,7 +208,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                 }
 
                 const entries = JSON.parse(data);
-                entries.push(finalContent); // Add the new entry
+                entries.push(finalContent);
                 fs.writeFile(entriesFilePath, JSON.stringify(entries, null, 2), (err) => {
                     if (err) {
                         console.error('Error writing to entries file:', err);
@@ -212,8 +216,6 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                     }
 
                     console.log(`Content saved to ${jsonFilePath} and updated in entries.json`);
-
-                    // Send the JSON filename back to the client
                     res.json({ jsonFileName: jsonFilename });
                 });
             });
@@ -225,40 +227,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
     }
 });
 
-// API endpoint to get a specific entry by index
-app.get('/entries/:index', (req, res) => {
-    const index = parseInt(req.params.index, 10);
-    if (isNaN(index)) {
-        return res.status(400).json({ error: 'Invalid index' });
-    }
 
-    fs.readFile(entriesFilePath, (err, data) => {
-        if (err) {
-            console.error('Error reading entries file:', err);
-            return res.status(500).json({ error: 'Failed to read entries' });
-        }
-
-        const entries = JSON.parse(data);
-        if (index < 0 || index >= entries.length) {
-            return res.status(404).json({ error: 'Index out of bounds' });
-        }
-
-        res.json(entries[index]);
-    });
-});
-
-// API endpoint to get all entries
-app.get('/entries', (req, res) => {
-    fs.readFile(entriesFilePath, (err, data) => {
-        if (err) {
-            console.error('Error reading entries file:', err);
-            return res.status(500).json({ error: 'Failed to read entries' });
-        }
-
-        const entries = JSON.parse(data);
-        res.json(entries);
-    });
-});
 
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}/`);

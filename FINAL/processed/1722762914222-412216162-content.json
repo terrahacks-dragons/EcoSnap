@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A nutritious grain commonly eaten on the cob or as kernels.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown rice",
+      "Barley",
+      "Oats",
+      "Millet"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A high-energy vegetable known for its sweetness and versatility, often enjoyed on its own or as part of various dishes.",
+    "sugar": "6.3",
+    "protein": "3.2",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown rice",
+      "Millet",
+      "Barley",
+      "Buckwheat"
+    ]
+  }
+}

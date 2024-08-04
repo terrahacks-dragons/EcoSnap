@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "Fresh corn on the cob, a popular vegetable rich in fiber and nutrition.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown rice",
+      "Sweet potatoes",
+      "Barley",
+      "Millet"
+    ]
+  }
+}

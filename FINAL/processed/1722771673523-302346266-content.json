@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A cob of fresh corn, a popular vegetable known for its sweet flavor and versatility in cooking.",
+    "sugar": "6",
+    "protein": "3.4",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Amaranth",
+      "Barley",
+      "Farro",
+      "Millet"
+    ]
+  }
+}

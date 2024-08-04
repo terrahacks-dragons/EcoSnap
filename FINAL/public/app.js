@@ -1,14 +1,23 @@
 document.addEventListener("DOMContentLoaded", () => {
+    // Video and image elements
     const video = document.getElementById("video");
     const uploadedImage = document.getElementById("uploaded-image");
     const uploadInput = document.getElementById("upload-input");
     const captureBtn = document.getElementById("capture-btn");
     const resetBtn = document.getElementById("reset-btn");
     const flipBtn = document.getElementById("flip-btn");
+
+    // Optional elements
     const sustainabilityScore = document.getElementById("sustainability-score");
     const mostSustainableItem = document.getElementById("most-sustainable-item");
     const itemCalories = document.getElementById("item-calories");
-    const descriptionElement = document.getElementById("description"); // Added to display description
+    const descriptionElement = document.getElementById("description");
+    const sustainableAlternatives = document.getElementById("sustainable-alternatives");
+
+    // Additional elements
+    const fatContent = document.getElementById("fat-content");
+    const proteinContent = document.getElementById("protein-content");
+    const sugarContent = document.getElementById("sugar-content");
 
     let currentStream;
     let useFrontCamera = true;
@@ -52,7 +61,9 @@ document.addEventListener("DOMContentLoaded", () => {
         };
 
         reader.onerror = function () {
-            sustainabilityScore.textContent = 'Error loading image preview.';
+            if (sustainabilityScore) {
+                sustainabilityScore.textContent = 'Error loading image preview.';
+            }
         };
 
         reader.readAsDataURL(file);
@@ -83,13 +94,39 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Reset to video stream
     resetBtn.addEventListener("click", () => {
-        uploadedImage.classList.remove("active");
-        video.classList.add("active");
-        uploadInput.value = ''; // Clear the file input value
-        sustainabilityScore.textContent = '?/5';
-        mostSustainableItem.textContent = 'SAMPLE TEXT';
-        itemCalories.textContent = 'SAMPLE TEXT';
-        descriptionElement.textContent = 'No description available.'; // Added to reset description
+        if (uploadedImage) {
+            uploadedImage.classList.remove("active");
+        }
+        if (video) {
+            video.classList.add("active");
+        }
+        if (uploadInput) {
+            uploadInput.value = ''; // Clear the file input value
+        }
+        if (sustainabilityScore) {
+            sustainabilityScore.textContent = '?/5';
+        }
+        if (mostSustainableItem) {
+            mostSustainableItem.textContent = 'SAMPLE TEXT';
+        }
+        if (itemCalories) {
+            itemCalories.textContent = 'SAMPLE TEXT';
+        }
+        if (descriptionElement) {
+            descriptionElement.textContent = 'No description available.';
+        }
+        if (sustainableAlternatives) {
+            sustainableAlternatives.textContent = 'No alternatives available.';
+        }
+        if (fatContent) {
+            fatContent.textContent = 'No fat content available.';
+        }
+        if (proteinContent) {
+            proteinContent.textContent = 'No protein content available.';
+        }
+        if (sugarContent) {
+            sugarContent.textContent = 'No sugar content available.';
+        }
     });
 
     // Flip camera
@@ -136,13 +173,33 @@ document.addEventListener("DOMContentLoaded", () => {
             // Directly access and update content from JSON
             const { content } = jsonData;
 
-            const { item_name, calories, score, description } = content;
+            const { item_name, calories, score, description, fat, protein, sugar, alternatives } = content;
 
             // Update the HTML with the parsed data
-            mostSustainableItem.textContent = item_name || 'N/A';
-            itemCalories.textContent = `Estimated Calories: ${calories || 'N/A'} calories`;
-            sustainabilityScore.textContent = score ? `${score}/5` : '3/5';
-            descriptionElement.textContent = description || 'No description available.';
+            if (mostSustainableItem) {
+                mostSustainableItem.textContent = item_name || 'N/A';
+            }
+            if (itemCalories) {
+                itemCalories.textContent = `${calories || 'N/A'} calories`;
+            }
+            if (sustainabilityScore) {
+                sustainabilityScore.textContent = score ? `${score}/5` : '3/5';
+            }
+            if (descriptionElement) {
+                descriptionElement.textContent = description || 'No description available.';
+            }
+            if (sustainableAlternatives) {
+                sustainableAlternatives.textContent = alternatives ? alternatives.join(', ') : 'No alternatives available.';
+            }
+            if (fatContent) {
+                fatContent.textContent = ` ${fat || 'N/A'} grams`;
+            }
+            if (proteinContent) {
+                proteinContent.textContent = `${protein || 'N/A'} grams`;
+            }
+            if (sugarContent) {
+                sugarContent.textContent = `${sugar || 'N/A'} grams`;
+            }
 
         } catch (error) {
             // Log and alert only critical errors

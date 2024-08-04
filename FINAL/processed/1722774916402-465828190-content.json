@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Red Bull",
+    "calories": "110",
+    "score": "2",
+    "description": "A popular energy drink known for its stimulating properties.",
+    "sugar": "27",
+    "protein": "1",
+    "fat": "0",
+    "sustainable_alternatives": [
+      "Guayusa tea",
+      "Yerba mate",
+      "Green tea",
+      "Kombucha",
+      "Coconut water"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A nutritious grain rich in fiber, vitamins, and minerals, often consumed as a vegetable.",
+    "sugar": "6",
+    "protein": "3.3",
+    "fat": "1.2",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Barley",
+      "Millet",
+      "Amaranth",
+      "Brown Rice"
+    ]
+  }
+}

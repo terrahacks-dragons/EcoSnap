@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A sweet, yellow vegetable commonly consumed fresh, cooked, or processed into various food products.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Barley",
+      "Millet",
+      "Sorghum",
+      "Oats"
+    ]
+  }
+}

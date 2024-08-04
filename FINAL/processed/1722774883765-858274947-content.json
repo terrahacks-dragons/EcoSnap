@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Pastry Assortment",
+    "calories": "350",
+    "score": "3",
+    "description": "An assortment of pastries including a danish, croissant, and fruit snacks.",
+    "sugar": "20",
+    "protein": "5",
+    "fat": "15",
+    "sustainable_alternatives": [
+      "Whole grain pastries",
+      "Fruit bars",
+      "Vegan muffins",
+      "Nut-based snacks",
+      "Granola bars"
+    ]
+  }
+}

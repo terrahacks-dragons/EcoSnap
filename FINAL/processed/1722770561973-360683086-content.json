@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "Fresh corn on the cob, sweet and juicy.",
+    "sugar": "6",
+    "protein": "3.4",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown rice",
+      "Millet",
+      "Barley",
+      "Sweet potatoes"
+    ]
+  }
+}

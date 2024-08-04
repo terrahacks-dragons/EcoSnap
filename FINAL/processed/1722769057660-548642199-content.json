@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A nutritious vegetable high in fiber and vitamins, commonly used in various dishes.",
+    "sugar": "6",
+    "protein": "3",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Brown Rice",
+      "Sweet Potatoes",
+      "Peas",
+      "Barley"
+    ]
+  }
+}

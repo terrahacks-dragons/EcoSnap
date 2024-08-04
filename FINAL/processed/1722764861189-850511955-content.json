@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "86",
+    "score": "4",
+    "description": "A yellow ear of corn, commonly eaten as a vegetable or used in various dishes.",
+    "sugar": "4.5",
+    "protein": "3.2",
+    "fat": "1.2",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Barley",
+      "Millet",
+      "Farro",
+      "Buckwheat"
+    ]
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "content": {
+    "item_name": "Corn",
+    "calories": "96",
+    "score": "4",
+    "description": "A fresh ear of corn with yellow kernels, often enjoyed boiled, grilled, or in various dishes.",
+    "sugar": "6",
+    "protein": "3.4",
+    "fat": "1.5",
+    "sustainable_alternatives": [
+      "Quinoa",
+      "Millet",
+      "Barley",
+      "Amaranth",
+      "Brown Rice"
+    ]
+  }
+}
