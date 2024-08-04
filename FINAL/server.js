@@ -16,10 +16,11 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const port = 3000;
 
-// Ensure the uploads and processed directories exist
+// Ensure the uploads, processed, and public directories exist
 const uploadsDir = path.join(__dirname, 'uploads');
 const processedDir = path.join(__dirname, 'processed');
 const publicDir = path.join(__dirname, 'public');
+const entriesFilePath = path.join(__dirname, 'entries.json');
 
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir);
@@ -31,6 +32,11 @@ if (!fs.existsSync(processedDir)) {
 
 if (!fs.existsSync(publicDir)) {
     fs.mkdirSync(publicDir);
+}
+
+// Create entries.json if it doesn't exist
+if (!fs.existsSync(entriesFilePath)) {
+    fs.writeFileSync(entriesFilePath, JSON.stringify([]));
 }
 
 // Configure Multer for file uploads
@@ -87,7 +93,7 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                             type: 'text',
                             text: 'Please analyze the following image and provide the information in the strict JSON format below. ' +
                                 'Fill in each field with the data you can extract from the image. ' +
-                                'If you cannot determine a particular field, leave it as an empty string. ' +
+                                'Always give values for every category. Do not write unknown for any category.' +
                                 'The format should be as follows:' +
                                 '\n\n' +
                                 '{\n' +
@@ -95,11 +101,15 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                                 '    "item_name": "",\n' +
                                 '    "calories": "",\n' +
                                 '    "score": "",\n' +
-                                '    "description": ""\n' +
+                                '    "description": "",\n' +
+                                '    "sugar": "",\n' +
+                                '    "protein": "",\n' +
+                                '    "fat": "",\n' +
+                                '    "sustainable_alternatives": []\n' +
                                 '  }\n' +
                                 '}\n\n' +
-                                'Please include the item name, estimated calories (never leave calories blank always give a number), sustainability score out of 5, and a brief description of the food item. ' +
-                                'If the item is not food, you can leave all fields as empty strings.'
+                                'Please include the item name, estimated calories, sustainability score out of 5, a brief description of the food item or plate of food, sugar (g), protein (g), fat (g), and a list of 5 sustainable alternatives. ' +
+                                'If the item is not food, you can leave all fields as empty strings or empty array.'
                         },
                         {
                             type: 'image_url',
@@ -129,12 +139,14 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
 
         const messageContent = data.choices[0].message.content;
 
-        // Remove extra formatting and parse JSON content
-        const cleanedContent = messageContent
-            .replace(/```json\n|\n```/g, '') // Remove ```json\n and \n```
-            .trim();
+        if (messageContent.includes('not food')) {
+            return res.json({ error: 'Not recognized as food' });
+        }
 
+        // Extract and clean up JSON string from the description field
+        const cleanedContent = messageContent.replace(/```json\n|\n```/g, '');
         let parsedContent;
+
         try {
             parsedContent = JSON.parse(cleanedContent);
         } catch (error) {
@@ -142,11 +154,22 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
             return res.status(500).json({ error: 'Failed to parse JSON content' });
         }
 
-        if (!parsedContent.content) {
-            return res.status(400).json({ error: 'Invalid content format' });
-        }
+        // Extract content
+        const { content } = parsedContent;
 
-        // Move the uploaded image to the processed directory
+        // Create the finalContent object with new fields
+        const finalContent = {
+            item_name: content.item_name || 'Unknown',
+            calories: content.calories || 'N/A',
+            score: content.score || 'N/A',
+            description: content.description || 'No description available.',
+            sugar: content.sugar || 'N/A',
+            protein: content.protein || 'N/A',
+            fat: content.fat || 'N/A',
+            sustainable_alternatives: content.sustainable_alternatives || []
+        };
+
+        // Define the new path in the processed directory with the correct extension
         const newImagePath = path.join(processedDir, req.file.filename);
         fs.rename(imagePath, newImagePath, (err) => {
             if (err) {
@@ -159,21 +182,61 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
         const jsonFilename = `${path.basename(newImagePath, path.extname(newImagePath))}-content.json`;
         const jsonFilePath = path.join(processedDir, jsonFilename);
 
-        fs.writeFile(jsonFilePath, JSON.stringify(parsedContent, null, 2), (err) => {
+        fs.writeFile(jsonFilePath, JSON.stringify({ content: finalContent }, null, 2), (err) => {
             if (err) {
                 console.error('Error writing JSON file:', err);
                 return res.status(500).json({ error: 'Failed to save JSON response' });
             }
-            console.log(`Content saved to ${jsonFilePath}`);
 
-            // Send the JSON filename back to the client
-            res.json({ jsonFileName: jsonFilename });
+            // Update the global entries.json file
+            fs.readFile(entriesFilePath, (err, data) => {
+                if (err) {
+                    console.error('Error reading entries file:', err);
+                    return res.status(500).json({ error: 'Failed to update entries' });
+                }
+
+                const entries = JSON.parse(data);
+                entries.push(finalContent); // Add the new entry
+                fs.writeFile(entriesFilePath, JSON.stringify(entries, null, 2), (err) => {
+                    if (err) {
+                        console.error('Error writing to entries file:', err);
+                        return res.status(500).json({ error: 'Failed to update entries file' });
+                    }
+
+                    console.log(`Content saved to ${jsonFilePath} and updated in entries.json`);
+
+                    // Send the JSON filename back to the client
+                    res.json({ jsonFileName: jsonFilename });
+                });
+            });
         });
 
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to analyze image' });
     }
+});
+
+// API endpoint to get a specific entry by index
+app.get('/entries/:index', (req, res) => {
+    const index = parseInt(req.params.index, 10);
+    if (isNaN(index)) {
+        return res.status(400).json({ error: 'Invalid index' });
+    }
+
+    fs.readFile(entriesFilePath, (err, data) => {
+        if (err) {
+            console.error('Error reading entries file:', err);
+            return res.status(500).json({ error: 'Failed to read entries' });
+        }
+
+        const entries = JSON.parse(data);
+        if (index < 0 || index >= entries.length) {
+            return res.status(404).json({ error: 'Index out of bounds' });
+        }
+
+        res.json(entries[index]);
+    });
 });
 
 app.listen(port, () => {
