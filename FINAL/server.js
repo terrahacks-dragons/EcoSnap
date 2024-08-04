@@ -62,10 +62,18 @@ app.use('/processed', express.static(processedDir));
 // Parse JSON bodies
 app.use(express.json({ limit: '50mb' }));
 
-// Serve the Menu-Companion.html at the root URL
+// Serve the index.html at the root URL
+app.get('/', (req, res) => {
+    res.sendFile(path.join(publicDir, 'index.html'));
+});
+
+// Serve the Menu-Companion.html at the /menu-companion URL
 app.get('/menu-companion', (req, res) => {
     res.sendFile(path.join(publicDir, 'Menu-Companion.html'));
 });
+
+// Serve the index.css file
+app.use('/index.css', express.static(path.join(publicDir, 'index.css')));
 
 // API endpoint for analyzing images
 app.post('/analyze', upload.single('image'), async (req, res) => {
@@ -239,6 +247,19 @@ app.get('/entries/:index', (req, res) => {
     });
 });
 
+// API endpoint to get all entries
+app.get('/entries', (req, res) => {
+    fs.readFile(entriesFilePath, (err, data) => {
+        if (err) {
+            console.error('Error reading entries file:', err);
+            return res.status(500).json({ error: 'Failed to read entries' });
+        }
+
+        const entries = JSON.parse(data);
+        res.json(entries);
+    });
+});
+
 app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}/menu-companion`);
+    console.log(`Server running at http://localhost:${port}/`);
 });
