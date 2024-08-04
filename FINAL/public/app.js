@@ -8,6 +8,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const sustainabilityScore = document.getElementById("sustainability-score");
     const mostSustainableItem = document.getElementById("most-sustainable-item");
     const itemCalories = document.getElementById("item-calories");
+    const descriptionElement = document.getElementById("description"); // Added to display description
 
     let currentStream;
     let useFrontCamera = true;
@@ -88,6 +89,7 @@ document.addEventListener("DOMContentLoaded", () => {
         sustainabilityScore.textContent = '?/5';
         mostSustainableItem.textContent = 'SAMPLE TEXT';
         itemCalories.textContent = 'SAMPLE TEXT';
+        descriptionElement.textContent = 'No description available.'; // Added to reset description
     });
 
     // Flip camera
@@ -119,24 +121,33 @@ document.addEventListener("DOMContentLoaded", () => {
                 return;
             }
 
-            // Extract details using regular expressions
-            const nameMatch = data.content.match(/Item Name:\s*(.*?)\s*\n/);
-            const caloriesMatch = data.content.match(/Estimated Calories:\s*(\d+)\s*calories/);
-            const scoreMatch = data.content.match(/Sustainability Score:\s*(\d+)\/10/);
+            // Fetch the JSON file with the result and update the HTML
+            const jsonFileName = data.jsonFileName; // Get JSON file name from server response
+            const jsonResponse = await fetch(`/processed/${jsonFileName}`);
 
-            const parsedData = {
-                name: nameMatch ? nameMatch[1].trim() : 'Unknown',
-                estimated_calories: caloriesMatch ? `${caloriesMatch[1]} calories` : 'N/A',
-                sustainability_score: scoreMatch ? `${scoreMatch[1]}/10` : 'N/A'
-            };
+            if (!jsonResponse.ok) {
+                // Do not throw an error or alert here; just log the issue
+                console.error('Error fetching JSON data:', await jsonResponse.text());
+                return; // Exit the function if fetching JSON fails
+            }
+
+            const jsonData = await jsonResponse.json();
+
+            // Directly access and update content from JSON
+            const { content } = jsonData;
+
+            const { item_name, calories, score, description } = content;
 
             // Update the HTML with the parsed data
-            mostSustainableItem.textContent = parsedData.name || 'N/A';
-            itemCalories.textContent = parsedData.estimated_calories;
-            sustainabilityScore.textContent = parsedData.sustainability_score;
+            mostSustainableItem.textContent = item_name || 'N/A';
+            itemCalories.textContent = `Estimated Calories: ${calories || 'N/A'} calories`;
+            sustainabilityScore.textContent = score ? `${score}/5` : 'N/A';
+            descriptionElement.textContent = description || 'No description available.';
+
         } catch (error) {
+            // Log and alert only critical errors
             console.error('Error processing image:', error);
-            alert('Failed to process image');
+            // alert('Failed to process image');
         }
     }
 

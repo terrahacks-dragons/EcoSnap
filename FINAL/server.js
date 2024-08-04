@@ -50,6 +50,9 @@ const upload = multer({ storage: storage });
 // Serve static files from the "public" directory
 app.use(express.static(publicDir));
 
+// Serve static files from the "processed" directory
+app.use('/processed', express.static(processedDir));
+
 // Parse JSON bodies
 app.use(express.json({ limit: '50mb' }));
 
@@ -82,11 +85,21 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                     content: [
                         {
                             type: 'text',
-                            text: 'Please analyze the following image and provide the information in a structured, human-readable format. ' +
-                                'For each identified food item, provide the following on a single line: item name, estimated calories, and sustainability score. ' +
-                                'Include a description of the food item in two sentences. ' +
-                                'If the item is not food, state that it is not food and omit calorie and other food information. ' +
-                                'Ensure clarity and readability, using complete sentences.'
+                            text: 'Please analyze the following image and provide the information in the strict JSON format below. ' +
+                                'Fill in each field with the data you can extract from the image. ' +
+                                'If you cannot determine a particular field, leave it as an empty string. ' +
+                                'The format should be as follows:' +
+                                '\n\n' +
+                                '{\n' +
+                                '  "content": {\n' +
+                                '    "item_name": "",\n' +
+                                '    "calories": "",\n' +
+                                '    "score": "",\n' +
+                                '    "description": ""\n' +
+                                '  }\n' +
+                                '}\n\n' +
+                                'Please include the item name, estimated calories, sustainability score out of 5, and a brief description of the food item. ' +
+                                'If the item is not food, you can leave all fields as empty strings.'
                         },
                         {
                             type: 'image_url',
@@ -116,14 +129,24 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
 
         const messageContent = data.choices[0].message.content;
 
-        if (messageContent.includes('not food')) {
-            return res.json({ error: 'Not recognized as food' });
+        // Remove extra formatting and parse JSON content
+        const cleanedContent = messageContent
+            .replace(/```json\n|\n```/g, '') // Remove ```json\n and \n```
+            .trim();
+
+        let parsedContent;
+        try {
+            parsedContent = JSON.parse(cleanedContent);
+        } catch (error) {
+            console.error('Error parsing JSON content:', error);
+            return res.status(500).json({ error: 'Failed to parse JSON content' });
         }
 
-        // Send the entire message content to the client for parsing
-        res.json({ content: messageContent });
+        if (!parsedContent.content) {
+            return res.status(400).json({ error: 'Invalid content format' });
+        }
 
-        // Define the new path in the processed directory with the correct extension
+        // Move the uploaded image to the processed directory
         const newImagePath = path.join(processedDir, req.file.filename);
         fs.rename(imagePath, newImagePath, (err) => {
             if (err) {
@@ -131,6 +154,22 @@ app.post('/analyze', upload.single('image'), async (req, res) => {
                 return res.status(500).json({ error: 'Failed to move processed image' });
             }
         });
+
+        // Save the parsed content as a .json file in the specified format
+        const jsonFilename = `${path.basename(newImagePath, path.extname(newImagePath))}-content.json`;
+        const jsonFilePath = path.join(processedDir, jsonFilename);
+
+        fs.writeFile(jsonFilePath, JSON.stringify(parsedContent, null, 2), (err) => {
+            if (err) {
+                console.error('Error writing JSON file:', err);
+                return res.status(500).json({ error: 'Failed to save JSON response' });
+            }
+            console.log(`Content saved to ${jsonFilePath}`);
+
+            // Send the JSON filename back to the client
+            res.json({ jsonFileName: jsonFilename });
+        });
+
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: 'Failed to analyze image' });
