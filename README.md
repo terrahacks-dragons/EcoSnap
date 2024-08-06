@@ -56,7 +56,7 @@ To set up the EcoSnap application on your local machine, follow these steps:
 
 1. **Clone the Repository:**
    ```bash
-   git clone https://github.com/your-repository/EcoSnap.git
+   git clone https://github.com/terrahacks-dragons/EcoSnap.git
    cd EcoSnap
    ```
 
