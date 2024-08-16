@@ -78,7 +78,7 @@ Start the server using the following command:
     ```
 ## Installation
 
-To deploy server on the web follow the steps in the file deploy_server
+To deploy server on the web follow the steps in the file [deploy_server.md](deploy_server.md)
 
 ## Explanation of `server.js`
 
