@@ -76,6 +76,9 @@ Start the server using the following command:
     ```bash
     npm start
     ```
+## Installation
+
+To deploy server on the web follow the steps in the file deploy_server
 
 ## Explanation of `server.js`
 
